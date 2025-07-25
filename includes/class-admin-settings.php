@@ -271,11 +271,25 @@ class SmartWriter_Admin_Settings {
         $value = $settings['api_provider'] ?? 'perplexity';
         ?>
         <select name="smartwriter_ai_settings[api_provider]" id="api_provider">
-            <option value="perplexity" <?php selected($value, 'perplexity'); ?>>Perplexity AI</option>
-            <option value="openai" <?php selected($value, 'openai'); ?>>OpenAI</option>
-            <option value="anthropic" <?php selected($value, 'anthropic'); ?>>Anthropic Claude</option>
+            <optgroup label="<?php _e('Premium Providers', 'smartwriter-ai'); ?>">
+                <option value="perplexity" <?php selected($value, 'perplexity'); ?>>Perplexity AI (Recommended)</option>
+                <option value="openai" <?php selected($value, 'openai'); ?>>OpenAI (GPT)</option>
+                <option value="anthropic" <?php selected($value, 'anthropic'); ?>>Anthropic Claude</option>
+            </optgroup>
+            <optgroup label="<?php _e('Paid API Services', 'smartwriter-ai'); ?>">
+                <option value="copyai" <?php selected($value, 'copyai'); ?>>Copy.ai</option>
+                <option value="writesonic" <?php selected($value, 'writesonic'); ?>>Writesonic</option>
+                <option value="neuroflash" <?php selected($value, 'neuroflash'); ?>>Neuroflash</option>
+                <option value="ink" <?php selected($value, 'ink'); ?>>INK Editor AI</option>
+            </optgroup>
+            <optgroup label="<?php _e('Free Providers', 'smartwriter-ai'); ?>">
+                <option value="openrouter" <?php selected($value, 'openrouter'); ?>>OpenRouter.ai (Free Models)</option>
+                <option value="deepinfra" <?php selected($value, 'deepinfra'); ?>>DeepInfra (Free Tier)</option>
+                <option value="huggingface" <?php selected($value, 'huggingface'); ?>>Hugging Face (Free)</option>
+                <option value="replicate" <?php selected($value, 'replicate'); ?>>Replicate (Free Tier)</option>
+            </optgroup>
         </select>
-        <p class="description"><?php _e('Choose your preferred AI API provider.', 'smartwriter-ai'); ?></p>
+        <p class="description"><?php _e('Choose your preferred AI API provider. Free providers have usage limits.', 'smartwriter-ai'); ?></p>
         <?php
     }
     

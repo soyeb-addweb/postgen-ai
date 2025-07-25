@@ -257,9 +257,61 @@ $api_configured = !empty($settings['api_key']);
                     </h2>
                     
                     <div style="padding: 20px;">
-                        <p style="font-size: 16px; margin-bottom: 25px;">
-                            <?php _e('SmartWriter AI supports multiple AI providers. Choose the one that best fits your needs and budget.', 'smartwriter-ai'); ?>
-                        </p>
+                                                 <p style="font-size: 16px; margin-bottom: 25px;">
+                             <?php _e('SmartWriter AI supports multiple AI providers, including premium services and free alternatives. Choose the one that best fits your needs and budget.', 'smartwriter-ai'); ?>
+                         </p>
+
+                         <!-- Provider Categories -->
+                         <div class="provider-categories" style="margin-bottom: 30px;">
+                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                                 <div class="provider-category" style="padding: 20px; border: 2px solid #4caf50; border-radius: 8px; background: #f8fff8;">
+                                     <h3 style="margin-top: 0; color: #2e7d32;">
+                                         <span class="dashicons dashicons-yes-alt"></span>
+                                         <?php _e('Free Providers', 'smartwriter-ai'); ?>
+                                     </h3>
+                                     <ul style="margin: 0; padding-left: 20px;">
+                                         <li><strong>OpenRouter.ai</strong> - Multiple free models</li>
+                                         <li><strong>DeepInfra</strong> - Mistral, Llama2, Falcon</li>
+                                         <li><strong>Hugging Face</strong> - Open-source models</li>
+                                         <li><strong>Replicate</strong> - Free tier available</li>
+                                     </ul>
+                                     <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
+                                         <?php _e('Great for testing and low-volume usage', 'smartwriter-ai'); ?>
+                                     </p>
+                                 </div>
+
+                                 <div class="provider-category" style="padding: 20px; border: 2px solid #ff9800; border-radius: 8px; background: #fff8f0;">
+                                     <h3 style="margin-top: 0; color: #ef6c00;">
+                                         <span class="dashicons dashicons-star-filled"></span>
+                                         <?php _e('Paid Services', 'smartwriter-ai'); ?>
+                                     </h3>
+                                     <ul style="margin: 0; padding-left: 20px;">
+                                         <li><strong>Copy.ai</strong> - Blog posts, marketing</li>
+                                         <li><strong>Writesonic</strong> - SEO-optimized content</li>
+                                         <li><strong>Neuroflash</strong> - German/English content</li>
+                                         <li><strong>INK Editor AI</strong> - SEO-focused writing</li>
+                                     </ul>
+                                     <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
+                                         <?php _e('Specialized features and higher quality', 'smartwriter-ai'); ?>
+                                     </p>
+                                 </div>
+
+                                 <div class="provider-category" style="padding: 20px; border: 2px solid #2271b1; border-radius: 8px; background: #f0f6ff;">
+                                     <h3 style="margin-top: 0; color: #1565c0;">
+                                         <span class="dashicons dashicons-awards"></span>
+                                         <?php _e('Premium Providers', 'smartwriter-ai'); ?>
+                                     </h3>
+                                     <ul style="margin: 0; padding-left: 20px;">
+                                         <li><strong>Perplexity AI</strong> - Real-time web search</li>
+                                         <li><strong>OpenAI</strong> - GPT-4, DALL-E integration</li>
+                                         <li><strong>Anthropic Claude</strong> - Safety-focused AI</li>
+                                     </ul>
+                                     <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
+                                         <?php _e('Highest quality and most reliable', 'smartwriter-ai'); ?>
+                                     </p>
+                                 </div>
+                             </div>
+                         </div>
 
                         <!-- Perplexity AI Setup -->
                         <div class="api-provider-section" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
@@ -366,8 +418,89 @@ $api_configured = !empty($settings['api_key']);
                             </div>
                         </div>
 
-                        <!-- Security Tips -->
-                        <div class="security-tips" style="background: #ffe6e6; padding: 20px; border-radius: 8px; border: 1px solid #ff9999;">
+                                                 <!-- Free Providers Setup -->
+                         <div class="free-providers-section" style="margin-bottom: 30px; padding: 20px; border: 2px solid #4caf50; border-radius: 8px; background: #f8fff8;">
+                             <h3 style="margin-top: 0; color: #2e7d32;">
+                                 <span class="dashicons dashicons-yes-alt"></span>
+                                 <?php _e('Free Providers Setup', 'smartwriter-ai'); ?>
+                             </h3>
+                             
+                             <div class="free-provider-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-top: 20px;">
+                                 <!-- OpenRouter.ai -->
+                                 <div class="free-provider-card" style="padding: 15px; background: white; border-radius: 6px; border: 1px solid #ddd;">
+                                     <h4 style="margin: 0 0 10px 0; color: #2e7d32;">OpenRouter.ai</h4>
+                                     <p style="font-size: 13px; margin-bottom: 10px;"><strong><?php _e('Best For:', 'smartwriter-ai'); ?></strong> <?php _e('Testing multiple models, free tier', 'smartwriter-ai'); ?></p>
+                                     <ol style="font-size: 13px; margin: 10px 0 10px 20px;">
+                                         <li><?php _e('Visit', 'smartwriter-ai'); ?> <a href="https://openrouter.ai" target="_blank">openrouter.ai</a></li>
+                                         <li><?php _e('Sign up for free account', 'smartwriter-ai'); ?></li>
+                                         <li><?php _e('Get API key from dashboard', 'smartwriter-ai'); ?></li>
+                                         <li><?php _e('Use mistralai/mistral-7b-instruct (free)', 'smartwriter-ai'); ?></li>
+                                     </ol>
+                                     <div style="background: #e8f5e8; padding: 8px; border-radius: 4px; font-size: 12px; color: #2e7d32;">
+                                         <strong><?php _e('Free Limit:', 'smartwriter-ai'); ?></strong> <?php _e('$1 free credit monthly', 'smartwriter-ai'); ?>
+                                     </div>
+                                 </div>
+
+                                 <!-- DeepInfra -->
+                                 <div class="free-provider-card" style="padding: 15px; background: white; border-radius: 6px; border: 1px solid #ddd;">
+                                     <h4 style="margin: 0 0 10px 0; color: #2e7d32;">DeepInfra</h4>
+                                     <p style="font-size: 13px; margin-bottom: 10px;"><strong><?php _e('Best For:', 'smartwriter-ai'); ?></strong> <?php _e('Fast inference, Mistral/Llama models', 'smartwriter-ai'); ?></p>
+                                     <ol style="font-size: 13px; margin: 10px 0 10px 20px;">
+                                         <li><?php _e('Visit', 'smartwriter-ai'); ?> <a href="https://deepinfra.com" target="_blank">deepinfra.com</a></li>
+                                         <li><?php _e('Sign up with email', 'smartwriter-ai'); ?></li>
+                                         <li><?php _e('Generate API key', 'smartwriter-ai'); ?></li>
+                                         <li><?php _e('Use Mistral-7B-Instruct (free)', 'smartwriter-ai'); ?></li>
+                                     </ol>
+                                     <div style="background: #e8f5e8; padding: 8px; border-radius: 4px; font-size: 12px; color: #2e7d32;">
+                                         <strong><?php _e('Free Limit:', 'smartwriter-ai'); ?></strong> <?php _e('$1 free monthly credit', 'smartwriter-ai'); ?>
+                                     </div>
+                                 </div>
+
+                                 <!-- Hugging Face -->
+                                 <div class="free-provider-card" style="padding: 15px; background: white; border-radius: 6px; border: 1px solid #ddd;">
+                                     <h4 style="margin: 0 0 10px 0; color: #2e7d32;">Hugging Face</h4>
+                                     <p style="font-size: 13px; margin-bottom: 10px;"><strong><?php _e('Best For:', 'smartwriter-ai'); ?></strong> <?php _e('Open-source models, research', 'smartwriter-ai'); ?></p>
+                                     <ol style="font-size: 13px; margin: 10px 0 10px 20px;">
+                                         <li><?php _e('Visit', 'smartwriter-ai'); ?> <a href="https://huggingface.co" target="_blank">huggingface.co</a></li>
+                                         <li><?php _e('Create free account', 'smartwriter-ai'); ?></li>
+                                         <li><?php _e('Go to Settings → Access Tokens', 'smartwriter-ai'); ?></li>
+                                         <li><?php _e('Create new token (read)', 'smartwriter-ai'); ?></li>
+                                     </ol>
+                                     <div style="background: #e8f5e8; padding: 8px; border-radius: 4px; font-size: 12px; color: #2e7d32;">
+                                         <strong><?php _e('Free Limit:', 'smartwriter-ai'); ?></strong> <?php _e('30 requests/minute', 'smartwriter-ai'); ?>
+                                     </div>
+                                 </div>
+
+                                 <!-- Replicate -->
+                                 <div class="free-provider-card" style="padding: 15px; background: white; border-radius: 6px; border: 1px solid #ddd;">
+                                     <h4 style="margin: 0 0 10px 0; color: #2e7d32;">Replicate</h4>
+                                     <p style="font-size: 13px; margin-bottom: 10px;"><strong><?php _e('Best For:', 'smartwriter-ai'); ?></strong> <?php _e('Various AI models, image generation', 'smartwriter-ai'); ?></p>
+                                     <ol style="font-size: 13px; margin: 10px 0 10px 20px;">
+                                         <li><?php _e('Visit', 'smartwriter-ai'); ?> <a href="https://replicate.com" target="_blank">replicate.com</a></li>
+                                         <li><?php _e('Sign up for account', 'smartwriter-ai'); ?></li>
+                                         <li><?php _e('Go to Account → API tokens', 'smartwriter-ai'); ?></li>
+                                         <li><?php _e('Create new API token', 'smartwriter-ai'); ?></li>
+                                     </ol>
+                                     <div style="background: #e8f5e8; padding: 8px; border-radius: 4px; font-size: 12px; color: #2e7d32;">
+                                         <strong><?php _e('Free Limit:', 'smartwriter-ai'); ?></strong> <?php _e('$10 free monthly credit', 'smartwriter-ai'); ?>
+                                     </div>
+                                 </div>
+                             </div>
+
+                             <div class="free-providers-tips" style="margin-top: 20px; padding: 15px; background: #fff3e0; border-radius: 6px;">
+                                 <h4 style="margin-top: 0;"><?php _e('Free Provider Tips:', 'smartwriter-ai'); ?></h4>
+                                 <ul style="margin-left: 20px; font-size: 13px;">
+                                     <li><?php _e('Start with OpenRouter.ai for the best free experience', 'smartwriter-ai'); ?></li>
+                                     <li><?php _e('Monitor your usage to stay within free limits', 'smartwriter-ai'); ?></li>
+                                     <li><?php _e('Free models may have slower response times', 'smartwriter-ai'); ?></li>
+                                     <li><?php _e('Quality may vary compared to premium providers', 'smartwriter-ai'); ?></li>
+                                     <li><?php _e('Perfect for testing and low-volume blogs', 'smartwriter-ai'); ?></li>
+                                 </ul>
+                             </div>
+                         </div>
+
+                         <!-- Security Tips -->
+                         <div class="security-tips" style="background: #ffe6e6; padding: 20px; border-radius: 8px; border: 1px solid #ff9999;">
                             <h3 style="margin-top: 0; color: #d63384;">
                                 <span class="dashicons dashicons-shield"></span>
                                 <?php _e('Security Best Practices', 'smartwriter-ai'); ?>

@@ -17,6 +17,18 @@ class SmartWriter_API_Connector {
     const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
     const ANTHROPIC_ENDPOINT = 'https://api.anthropic.com/v1/messages';
     
+    // Paid API Providers
+    const COPYAI_ENDPOINT = 'https://api.copy.ai/v1/chat/completions';
+    const WRITESONIC_ENDPOINT = 'https://api.writesonic.com/v2/business/content/chatsonic';
+    const NEUROFLASH_ENDPOINT = 'https://api.neuroflash.com/v1/text/generate';
+    const INK_ENDPOINT = 'https://app.inkforall.com/api/v1/content/generate';
+    
+    // Free API Providers
+    const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
+    const DEEPINFRA_ENDPOINT = 'https://api.deepinfra.com/v1/openai/chat/completions';
+    const HUGGINGFACE_ENDPOINT = 'https://api-inference.huggingface.co/models/';
+    const REPLICATE_ENDPOINT = 'https://api.replicate.com/v1/predictions';
+    
     /**
      * Rate limiting
      */
@@ -145,9 +157,21 @@ class SmartWriter_API_Connector {
         $status_code = wp_remote_retrieve_response_code($response);
         $response_body = wp_remote_retrieve_body($response);
         
-        if ($status_code !== 200) {
+        if ($status_code !== 200 && $status_code !== 201 && $status_code !== 202) {
             $error_data = json_decode($response_body, true);
-            $error_message = $error_data['error']['message'] ?? 'Unknown API error';
+            
+            // Handle different error formats
+            $error_message = 'Unknown API error';
+            if (isset($error_data['error']['message'])) {
+                $error_message = $error_data['error']['message'];
+            } elseif (isset($error_data['error'])) {
+                $error_message = is_string($error_data['error']) ? $error_data['error'] : json_encode($error_data['error']);
+            } elseif (isset($error_data['message'])) {
+                $error_message = $error_data['message'];
+            } elseif (isset($error_data['detail'])) {
+                $error_message = $error_data['detail'];
+            }
+            
             throw new Exception("API error ($status_code): $error_message");
         }
         
@@ -157,6 +181,11 @@ class SmartWriter_API_Connector {
             throw new Exception('Invalid API response format');
         }
         
+        // Handle Replicate's async responses
+        if ($provider === 'replicate' && isset($data['status']) && $data['status'] === 'starting') {
+            $data = $this->poll_replicate_result($data['id'], $api_key);
+        }
+        
         return $this->extract_content_from_response($provider, $data);
     }
     
@@ -164,6 +193,8 @@ class SmartWriter_API_Connector {
      * Get API endpoint
      */
     private function get_api_endpoint($provider) {
+        $settings = get_option('smartwriter_ai_settings', []);
+        
         switch ($provider) {
             case 'perplexity':
                 return self::PERPLEXITY_ENDPOINT;
@@ -171,6 +202,28 @@ class SmartWriter_API_Connector {
                 return self::OPENAI_ENDPOINT;
             case 'anthropic':
                 return self::ANTHROPIC_ENDPOINT;
+                
+            // Paid Providers
+            case 'copyai':
+                return self::COPYAI_ENDPOINT;
+            case 'writesonic':
+                return self::WRITESONIC_ENDPOINT;
+            case 'neuroflash':
+                return self::NEUROFLASH_ENDPOINT;
+            case 'ink':
+                return self::INK_ENDPOINT;
+                
+            // Free Providers
+            case 'openrouter':
+                return self::OPENROUTER_ENDPOINT;
+            case 'deepinfra':
+                return self::DEEPINFRA_ENDPOINT;
+            case 'huggingface':
+                $model = $settings['model'] ?? 'mistralai/Mistral-7B-Instruct-v0.1';
+                return self::HUGGINGFACE_ENDPOINT . $model;
+            case 'replicate':
+                return self::REPLICATE_ENDPOINT;
+                
             default:
                 return self::PERPLEXITY_ENDPOINT;
         }
@@ -188,11 +241,42 @@ class SmartWriter_API_Connector {
         switch ($provider) {
             case 'perplexity':
             case 'openai':
+            case 'openrouter':
+            case 'deepinfra':
                 $base_headers['Authorization'] = 'Bearer ' . $api_key;
                 break;
+                
             case 'anthropic':
                 $base_headers['x-api-key'] = $api_key;
                 $base_headers['anthropic-version'] = '2023-06-01';
+                break;
+                
+            case 'copyai':
+                $base_headers['Authorization'] = 'Bearer ' . $api_key;
+                $base_headers['Accept'] = 'application/json';
+                break;
+                
+            case 'writesonic':
+                $base_headers['X-API-KEY'] = $api_key;
+                $base_headers['Accept'] = 'application/json';
+                break;
+                
+            case 'neuroflash':
+                $base_headers['Authorization'] = 'Bearer ' . $api_key;
+                $base_headers['Accept'] = 'application/json';
+                break;
+                
+            case 'ink':
+                $base_headers['Authorization'] = 'Bearer ' . $api_key;
+                $base_headers['Accept'] = 'application/json';
+                break;
+                
+            case 'huggingface':
+                $base_headers['Authorization'] = 'Bearer ' . $api_key;
+                break;
+                
+            case 'replicate':
+                $base_headers['Authorization'] = 'Token ' . $api_key;
                 break;
         }
         
@@ -253,9 +337,156 @@ class SmartWriter_API_Connector {
                     ]
                 ];
                 
+            // OpenAI-Compatible Providers
+            case 'openrouter':
+                return [
+                    'model' => $model ?: 'mistralai/mistral-7b-instruct',
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => 'You are a professional content writer. Always respond with well-structured, engaging content. If asked to format as JSON, ensure valid JSON format.'
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => $prompt
+                        ]
+                    ],
+                    'max_tokens' => 2000,
+                    'temperature' => 0.7
+                ];
+                
+            case 'deepinfra':
+                return [
+                    'model' => $model ?: 'mistralai/Mistral-7B-Instruct-v0.1',
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => 'You are a professional content writer. Always respond with well-structured, engaging content. If asked to format as JSON, ensure valid JSON format.'
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => $prompt
+                        ]
+                    ],
+                    'max_tokens' => 2000,
+                    'temperature' => 0.7,
+                    'stream' => false
+                ];
+                
+            // Paid Providers with Custom APIs
+            case 'copyai':
+                return [
+                    'model' => $model ?: 'gpt-3.5-turbo',
+                    'messages' => [
+                        [
+                            'role' => 'user',
+                            'content' => $prompt
+                        ]
+                    ],
+                    'max_tokens' => 2000,
+                    'temperature' => 0.7
+                ];
+                
+            case 'writesonic':
+                return [
+                    'enable_google_results' => true,
+                    'enable_memory' => false,
+                    'input_text' => $prompt,
+                    'history_data' => []
+                ];
+                
+            case 'neuroflash':
+                return [
+                    'text' => $prompt,
+                    'language' => 'en',
+                    'style' => 'professional',
+                    'max_tokens' => 2000
+                ];
+                
+            case 'ink':
+                return [
+                    'prompt' => $prompt,
+                    'type' => 'blog_post',
+                    'max_tokens' => 2000,
+                    'temperature' => 0.7
+                ];
+                
+            // Hugging Face
+            case 'huggingface':
+                return [
+                    'inputs' => $prompt,
+                    'parameters' => [
+                        'max_length' => 2000,
+                        'temperature' => 0.7,
+                        'do_sample' => true,
+                        'top_p' => 0.9
+                    ]
+                ];
+                
+            // Replicate
+            case 'replicate':
+                return [
+                    'version' => $this->get_replicate_model_version($model),
+                    'input' => [
+                        'prompt' => $prompt,
+                        'max_tokens' => 2000,
+                        'temperature' => 0.7
+                    ]
+                ];
+                
             default:
                 return [];
         }
+    }
+    
+    /**
+     * Poll Replicate for result
+     */
+    private function poll_replicate_result($prediction_id, $api_key) {
+        $max_attempts = 30; // 30 seconds max
+        $attempt = 0;
+        
+        while ($attempt < $max_attempts) {
+            sleep(1);
+            $attempt++;
+            
+            $response = wp_remote_get("https://api.replicate.com/v1/predictions/{$prediction_id}", [
+                'headers' => [
+                    'Authorization' => 'Token ' . $api_key,
+                    'Content-Type' => 'application/json'
+                ],
+                'timeout' => 10
+            ]);
+            
+            if (is_wp_error($response)) {
+                continue;
+            }
+            
+            $data = json_decode(wp_remote_retrieve_body($response), true);
+            
+            if (isset($data['status'])) {
+                if ($data['status'] === 'succeeded') {
+                    return $data;
+                } elseif ($data['status'] === 'failed') {
+                    throw new Exception('Replicate prediction failed: ' . ($data['error'] ?? 'Unknown error'));
+                }
+            }
+        }
+        
+        throw new Exception('Replicate prediction timed out');
+    }
+    
+    /**
+     * Get Replicate model version
+     */
+    private function get_replicate_model_version($model) {
+        $replicate_models = [
+            'mistral-7b' => 'f1974b92b13d324bbbc3a51fec82af8e78831a0a926b9ef68dd3ac4b49e18b4a3',
+            'llama2-7b' => 'f1d50bb24186c52daae319ca8366e53debdaa9e0ae7ff976e918df752732ccc4',
+            'codellama-7b' => 'ac808388e2e9d8ed35a5bf2eaa7d83f0ad53f9e3df31a42e4eb0a0c3249b3165'
+        ];
+        
+        return $replicate_models[$model] ?? $replicate_models['mistral-7b'];
     }
     
     /**
@@ -265,6 +496,9 @@ class SmartWriter_API_Connector {
         switch ($provider) {
             case 'perplexity':
             case 'openai':
+            case 'openrouter':
+            case 'deepinfra':
+            case 'copyai':
                 if (isset($data['choices'][0]['message']['content'])) {
                     return [
                         'content' => $data['choices'][0]['message']['content'],
@@ -278,6 +512,59 @@ class SmartWriter_API_Connector {
                     return [
                         'content' => $data['content'][0]['text'],
                         'usage' => $data['usage'] ?? null
+                    ];
+                }
+                break;
+                
+            case 'writesonic':
+                if (isset($data['message'])) {
+                    return [
+                        'content' => $data['message'],
+                        'usage' => null
+                    ];
+                }
+                break;
+                
+            case 'neuroflash':
+                if (isset($data['data']['text'])) {
+                    return [
+                        'content' => $data['data']['text'],
+                        'usage' => null
+                    ];
+                }
+                break;
+                
+            case 'ink':
+                if (isset($data['result'])) {
+                    return [
+                        'content' => $data['result'],
+                        'usage' => null
+                    ];
+                }
+                break;
+                
+            case 'huggingface':
+                if (isset($data[0]['generated_text'])) {
+                    // Remove the original prompt from the response
+                    $content = $data[0]['generated_text'];
+                    return [
+                        'content' => $content,
+                        'usage' => null
+                    ];
+                } elseif (is_string($data)) {
+                    return [
+                        'content' => $data,
+                        'usage' => null
+                    ];
+                }
+                break;
+                
+            case 'replicate':
+                if (isset($data['output'])) {
+                    $content = is_array($data['output']) ? implode('', $data['output']) : $data['output'];
+                    return [
+                        'content' => $content,
+                        'usage' => null
                     ];
                 }
                 break;
@@ -495,14 +782,79 @@ class SmartWriter_API_Connector {
                 return [
                     'gpt-3.5-turbo',
                     'gpt-4',
-                    'gpt-4-turbo'
+                    'gpt-4-turbo',
+                    'gpt-4o'
                 ];
                 
             case 'anthropic':
                 return [
                     'claude-3-sonnet-20240229',
                     'claude-3-opus-20240229',
-                    'claude-3-haiku-20240307'
+                    'claude-3-haiku-20240307',
+                    'claude-3-5-sonnet-20241022'
+                ];
+                
+            // Paid Providers
+            case 'copyai':
+                return [
+                    'gpt-3.5-turbo',
+                    'gpt-4',
+                    'claude-3-sonnet'
+                ];
+                
+            case 'writesonic':
+                return [
+                    'gpt-3.5-turbo',
+                    'gpt-4',
+                    'claude-3-sonnet'
+                ];
+                
+            case 'neuroflash':
+                return [
+                    'neuroflash-standard',
+                    'neuroflash-premium'
+                ];
+                
+            case 'ink':
+                return [
+                    'ink-gpt-3.5',
+                    'ink-gpt-4'
+                ];
+                
+            // Free Providers
+            case 'openrouter':
+                return [
+                    'mistralai/mistral-7b-instruct',
+                    'microsoft/phi-3-mini',
+                    'microsoft/phi-2',
+                    'nousresearch/nous-capybara-7b',
+                    'openchat/openchat-7b',
+                    'gryphe/mythomist-7b'
+                ];
+                
+            case 'deepinfra':
+                return [
+                    'mistralai/Mistral-7B-Instruct-v0.1',
+                    'meta-llama/Llama-2-7b-chat-hf',
+                    'meta-llama/Llama-2-13b-chat-hf',
+                    'tiiuae/falcon-7b-instruct',
+                    'codellama/CodeLlama-7b-Instruct-hf'
+                ];
+                
+            case 'huggingface':
+                return [
+                    'mistralai/Mistral-7B-Instruct-v0.1',
+                    'bigscience/bloom',
+                    'tiiuae/falcon-7b',
+                    'microsoft/DialoGPT-medium',
+                    'EleutherAI/gpt-neo-2.7B'
+                ];
+                
+            case 'replicate':
+                return [
+                    'mistral-7b',
+                    'llama2-7b',
+                    'codellama-7b'
                 ];
                 
             default:

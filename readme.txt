@@ -12,12 +12,12 @@ Automatically generate and schedule WordPress posts using Perplexity AI. Feature
 
 == Description ==
 
-**SmartWriter AI** is a comprehensive WordPress plugin that revolutionizes content creation by leveraging the power of artificial intelligence. Generate high-quality, SEO-optimized blog posts automatically with support for multiple AI providers including Perplexity AI, OpenAI, and Anthropic Claude.
+**SmartWriter AI** is a comprehensive WordPress plugin that revolutionizes content creation by leveraging the power of artificial intelligence. Generate high-quality, SEO-optimized blog posts automatically with support for 11+ AI providers including premium services (Perplexity AI, OpenAI, Anthropic Claude) and free alternatives (OpenRouter.ai, DeepInfra, Hugging Face, Replicate).
 
 ### 🚀 Key Features
 
 **AI Content Generation**
-* Support for Perplexity AI, OpenAI, and Anthropic Claude
+* Support for 11+ AI providers (Premium: Perplexity AI, OpenAI, Anthropic Claude | Free: OpenRouter.ai, DeepInfra, Hugging Face, Replicate)
 * Customizable prompt templates with dynamic placeholders
 * Intelligent content parsing and structuring
 * Real-time content preview
