@@ -68,6 +68,16 @@ class SmartWriter_Admin_Settings {
             'smartwriter-ai-logs',
             [$this, 'render_logs_page']
         );
+        
+        // Documentation submenu
+        add_submenu_page(
+            'smartwriter-ai',
+            __('Documentation', 'smartwriter-ai'),
+            __('Documentation', 'smartwriter-ai'),
+            'manage_options',
+            'smartwriter-ai-docs',
+            [$this, 'render_docs_page']
+        );
     }
     
     /**
@@ -531,5 +541,12 @@ class SmartWriter_Admin_Settings {
      */
     public function render_logs_page() {
         include SMARTWRITER_AI_DIR . 'templates/admin-logs.php';
+    }
+    
+    /**
+     * Render documentation page
+     */
+    public function render_docs_page() {
+        include SMARTWRITER_AI_DIR . 'templates/admin-docs.php';
     }
 }
