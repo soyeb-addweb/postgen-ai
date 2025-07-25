@@ -37,16 +37,40 @@ add_action('plugins_loaded', function () {
 });
 
 // Activation hook
-register_activation_hook(__FILE__, function() {
-    SmartWriter_AI::activate();
-});
+register_activation_hook(__FILE__, 'smartwriter_ai_activate_callback');
 
 // Deactivation hook
-register_deactivation_hook(__FILE__, function() {
-    SmartWriter_AI::deactivate();
-});
+register_deactivation_hook(__FILE__, 'smartwriter_ai_deactivate_callback');
 
 // Uninstall hook
-register_uninstall_hook(__FILE__, function() {
-    SmartWriter_AI::uninstall();
-});
+register_uninstall_hook(__FILE__, 'smartwriter_ai_uninstall_callback');
+
+/**
+ * Activation callback function
+ * Called when plugin is activated
+ */
+function smartwriter_ai_activate_callback() {
+    if (class_exists('SmartWriter_AI')) {
+        SmartWriter_AI::activate();
+    }
+}
+
+/**
+ * Deactivation callback function
+ * Called when plugin is deactivated
+ */
+function smartwriter_ai_deactivate_callback() {
+    if (class_exists('SmartWriter_AI')) {
+        SmartWriter_AI::deactivate();
+    }
+}
+
+/**
+ * Uninstall callback function
+ * Called when plugin is uninstalled
+ */
+function smartwriter_ai_uninstall_callback() {
+    if (class_exists('SmartWriter_AI')) {
+        SmartWriter_AI::uninstall();
+    }
+}
